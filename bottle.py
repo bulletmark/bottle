@@ -430,7 +430,7 @@ class Router:
     def match(self, environ):
         """ Return a (target, url_args) tuple or raise HTTPError(400/404/405). """
         verb = environ['REQUEST_METHOD'].upper()
-        path = environ['PATH_INFO'] or '/'
+        path = environ.get('PATH_INFO') or '/'
 
         methods = ('PROXY', 'HEAD', 'GET', 'ANY') if verb == 'HEAD' else ('PROXY', verb, 'ANY')
 
@@ -941,7 +941,7 @@ class Bottle:
         return tob(template(ERROR_PAGE_TEMPLATE, e=res, template_settings=dict(name='__ERROR_PAGE_TEMPLATE')))
 
     def _handle(self, environ):
-        path = environ['bottle.raw_path'] = environ['PATH_INFO']
+        path = environ['bottle.raw_path'] = environ.get('PATH_INFO') or '/'
         environ['PATH_INFO'] = _wsgi_recode(path)
 
         environ['bottle.app'] = self
@@ -1077,7 +1077,7 @@ class Bottle:
             _try_close(out)
             if not self.catchall: raise
             err = '<h1>Critical error while processing request: %s</h1>' \
-                  % html_escape(environ.get('PATH_INFO', '/'))
+                  % html_escape(environ.get('PATH_INFO') or '/')
             if DEBUG:
                 err += '<h2>Error:</h2>\n<pre>\n%s\n</pre>\n' \
                        '<h2>Traceback:</h2>\n<pre>\n%s\n</pre>\n' \
